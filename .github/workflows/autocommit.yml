@@ -1,7 +1,8 @@
 name: Automated Daily Commit
 on:
   schedule:
-    - cron: "0 8 * * *"  # Runs once a day at 1:30 PM IST
+    - cron: "0 8 * * *"  # Runs daily at 1:30 PM IST (8:00 AM UTC)
+  workflow_dispatch:  # Allows manual triggering
 
 jobs:
   commit:
@@ -9,6 +10,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Make a commit
         run: |
@@ -16,5 +19,6 @@ jobs:
           git config --global user.email "tusharkant306@gmail.com"
           git config --global user.name "Kant99"
           git add log.txt
-          git commit -m "Automated commit: $(date)"
+          git commit -m "Automated commit: $(date)" || exit 0
+          git pull  # Ensure no conflicts before pushing
           git push
